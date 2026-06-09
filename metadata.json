@@ -1,0 +1,6 @@
+{
+  "name": "SketchGit",
+  "description": "مزامنة مشاريع سكيتشوير (Sketchware) إلى GitHub وحل مشاكل الألوان المكررة والصلاحيات.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
