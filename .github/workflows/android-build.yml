@@ -1,25 +1,52 @@
 name: Build Android APK
+
 on:
+  workflow_dispatch:  # تشغيل يدوي
   push:
     branches: [ "main" ]
-  workflow_dispatch:
+    # يمكنك حذف السطرين التاليين إذا أردت البناء بعد كل push
+    paths:
+      - 'buildrun.txt'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Set up Gradle
+
+      - name: Setup Gradle (يثبت Gradle عالمياً)
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.11.1
+
+      - name: Generate Gradle wrapper if missing
+        run: |
+          if [ ! -f gradlew ]; then
+            echo "⚠️ gradlew غير موجود، سيتم إنشاؤه..."
+            gradle wrapper --gradle-version 8.11.1
+          fi
+          chmod +x gradlew
+
+      - name: Inject Gemini API Key (من GitHub Secrets)
+        run: |
+          # أنشئ ملف local.properties أو .env لتمرير المفتاح
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > local.properties
+          # أو حسب ما يتوقعه مشروعك
+          cat local.properties
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
+          name: MhasbMali-Debug-APK
           path: app/build/outputs/apk/debug/*.apk
